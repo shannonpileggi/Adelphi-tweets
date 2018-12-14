@@ -1,6 +1,9 @@
 # load rtweet library ----
 library(rtweet)
 
+# load tweet passwords (hidden on github) ----
+source("tweet.password")
+
 # create token (insert personal key/secrets/token) ----
 create_token(
   app = "AdelphiTweets",

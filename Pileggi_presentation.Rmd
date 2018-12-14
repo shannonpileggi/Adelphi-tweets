@@ -222,6 +222,12 @@ Introduction {.storyboard}
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">We are feeling festive!! The Christmas boxes for Operation Christmas child are packed and ready to go. We packed 22 this year and they will go to Children in need around the world. <a href="https://twitter.com/hashtag/Samaritanspurse?src=hash&amp;ref_src=twsrc%5Etfw">#Samaritanspurse</a> <a href="https://twitter.com/hashtag/christmasboxes?src=hash&amp;ref_src=twsrc%5Etfw">#christmasboxes</a> <a href="https://t.co/IE2nAQHeuO">pic.twitter.com/IE2nAQHeuO</a></p>&mdash; Adelphi Research (@AdelphiResearch) <a href="https://twitter.com/AdelphiResearch/status/1064553799417769989?ref_src=twsrc%5Etfw">November 19, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
+***
+#### Shiny Apps
+* [Tweet look-up](https://spileggi.shinyapps.io/tweet_lookup/)
+* [Term network analysis](https://spileggi.shinyapps.io/tweet_network/)
+
+
 ### Motivation
 
 * Learn about Adelphi Research's values and initiatives.
@@ -527,7 +533,7 @@ top_corrs_ht %>%
   graph_from_data_frame(vertices = vertices_ht) %>% 
     ggraph() +
     geom_edge_link() + 
-    geom_node_point(aes(size = occurrences * 1.1)) +
+    # geom_node_point(aes(size = occurrences * 1.1)) +
     geom_node_point(aes(size = occurrences,
                         color = geom_mean_retweets)) + 
     geom_node_text(aes(label = name), repel = TRUE) + 
@@ -536,12 +542,9 @@ top_corrs_ht %>%
          size = "Frequency",
          title = "Frequency, retweets, and relationships among @AdelphiResearch hashtags",
          subtitle = "Hashtags with at least 5 occurrences") +
-    # scale_color_gradient(low = "#0091ff", high = "#f0650e")
-    # scale_color_gradient(low='#05D9F6', high='#5011D1')
-     scale_color_gradient(low='#E1FA72', high='#F46FEE')
-    # scale_color_gradient(low='#E1FA72', high='#5011D1')
-    # scale_color_gradientn(colours = rainbow(5))
-
+    scale_color_gradient(low='#E1FA72', high='#F46FEE') +
+    scale_size_continuous(range = c(3, 8)) 
+    
 ```
 
 
@@ -587,7 +590,7 @@ top_corrs_text %>%
   graph_from_data_frame(vertices = vertices_text) %>% 
     ggraph() +
     geom_edge_link() + 
-    geom_node_point(aes(size = occurrences * 1.1)) +
+    # geom_node_point(aes(size = occurrences * 1.1)) +
     geom_node_point(aes(size = occurrences,
                         color = geom_mean_retweets)) + 
     geom_node_text(aes(label = name), repel = TRUE) + 
@@ -595,7 +598,8 @@ top_corrs_text %>%
     labs(color = "Average retweets",
          size = "Frequency",
          title = "Frequency, retweets, and relationships among top 100 words") +
-    scale_color_gradient(low='#E1FA72', high='#F46FEE')
+    scale_color_gradient(low='#E1FA72', high='#F46FEE') +
+    scale_size_continuous(range = c(3, 8)) 
 
 ```
 
