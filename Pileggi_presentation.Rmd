@@ -3,9 +3,55 @@ title: "@AdelphiResearch tweets"
 output: 
   flexdashboard::flex_dashboard:
     source_code: "https://github.com/shannonpileggi/Adelphi-tweets"
-    theme: sandstone
+    theme: journal
     storyboard: true
 ---
+
+<style type="text/css">
+
+
+.sbframe-commentary {
+font-size: 20px;
+}
+
+.sbframe-commentary h4 {
+font-size: 20px;
+}
+
+.chart-title {
+font-size: 22px;
+}
+
+.chart-wrapper ul li {
+font-size: 20px;
+}
+
+.chart-wrapper h4 {
+font-size: 24px;
+}
+
+
+.storyboard-nav .sbframelist ul li {
+font-size: 22px;
+}
+
+.storyboard-nav .sbframelist {
+margin: 0 auto;
+width: 94%;
+height: 50px;
+overflow: hidden;
+text-shadow: none;
+margin-bottom: 8px;
+}
+
+.storyboard-nav .sbnext, .storyboard-nav .sbprev {
+float: left;
+width: 2%;
+height: 50px;
+font-size: 50px;
+}
+
+</style>
 
 ```{r setup, include = FALSE, message = FALSE}
 # flexdashboard themes: journal, united, sandstone ----
@@ -176,14 +222,13 @@ Introduction {.storyboard}
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">We are feeling festive!! The Christmas boxes for Operation Christmas child are packed and ready to go. We packed 22 this year and they will go to Children in need around the world. <a href="https://twitter.com/hashtag/Samaritanspurse?src=hash&amp;ref_src=twsrc%5Etfw">#Samaritanspurse</a> <a href="https://twitter.com/hashtag/christmasboxes?src=hash&amp;ref_src=twsrc%5Etfw">#christmasboxes</a> <a href="https://t.co/IE2nAQHeuO">pic.twitter.com/IE2nAQHeuO</a></p>&mdash; Adelphi Research (@AdelphiResearch) <a href="https://twitter.com/AdelphiResearch/status/1064553799417769989?ref_src=twsrc%5Etfw">November 19, 2018</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-***
-#### Motivation
+### Motivation
 
-* Learn about Adelphi Research's values and initiatives
-* Provide Adelphi Research with insights regarding tweet themes and popularity
+* Learn about Adelphi Research's values and initiatives.
+* Provide Adelphi Research with insights regarding tweet themes and popularity.
 * Explore R packages
   + First time: `rtweet`, `scales`, `tidytext`, `widyr`, `ggraph`, `igraph`, `corrr`, `glmnet`
-  + Continued learning: `tidyverse`, `skimr`, `lubridate`, `broom`, `flexdashboard`, `DT`
+  + Continued learning: `tidyverse`, `forcats`, `skimr`, `lubridate`, `broom`, `flexdashboard`, `DT`
 * Presentation checklist:
   + focuses on market research
   + innovative
@@ -222,7 +267,7 @@ Tweet overview {.storyboard}
 
 ### Tweets over time
 
-```{r}
+```{r tweet_time_series}
 date_grid %>% 
   left_join(ar_tweets, by = "month_year") %>%
   group_by(month_year) %>% 
@@ -246,14 +291,13 @@ date_grid %>%
 
 * `r nrow(ar_tweets)` tweets 
 * all originate from `r ar_tweets %>% count(location) %>% .[[1]]` 
-* tweets begin at `r ar_tweets$created_at[nrow(ar_tweets)]`,  
-end at `r ar_tweets$created_at[1]`
+* tweets begin at `r ar_tweets$created_at[nrow(ar_tweets)]`, end at `r ar_tweets$created_at[1]`
 * original data set has `r num_var_start` variables
 * created an additional `r num_var_add` variables for analysis
 
 ### Tweet type {data-commentary-width=550}
 
-```{r}
+```{r type_of_tweet}
 ar_tweets %>% 
   group_by(type) %>%
   summarise(count = n()) %>% 
@@ -279,24 +323,24 @@ ar_tweets %>%
 ***
 
 #### **Original tweet**
-```{r, out.width = "450px"}
+```{r figure_1, out.width = "450px"}
 knitr::include_graphics("figures/original.png")
 ```
 
 #### **RT no comment**
-```{r, out.width = "450px"}
+```{r figure_2, out.width = "450px"}
 knitr::include_graphics("figures/rt.png")
 ```
 
 #### **RT w/ comment**
-```{r, out.width = "450px"}
+```{r figure_3, out.width = "450px"}
 knitr::include_graphics("figures/rt_comment.png")
 ```
 
 
 ### Likes and retweets {data-commentary-width=650}
 
-```{r}
+```{r popularity_barplot}
 labels <- c(favorite_count = "# of likes", 
             retweet_count = "# of retweets")
 
@@ -308,7 +352,7 @@ ar_original %>%
   ggplot(aes(x = number, y = n, fill = popularity)) +
     geom_bar(stat = "identity") +
     facet_grid(. ~ popularity, , labeller = labeller(popularity = labels)) +
-    geom_text(aes(label = n), vjust = -0.2) +
+    # geom_text(aes(label = n), vjust = -0.2) +
     theme_minimal() +
     ylim(0, 900) +
     theme(plot.title = element_text(face = "bold"),
@@ -329,7 +373,7 @@ ar_original %>%
 
 ***
 
-```{r}
+```{r popularity_time_series}
 ar_original %>% 
   group_by(year) %>% 
   summarize(like_total = sum(favorite_count),
@@ -369,23 +413,24 @@ ar_original %>%
 Hashtags {.storyboard}
 =========================================
 
-### Common hashtag themes {data-commentary-width=400}
+### Common hashtag themes {data-commentary-width=550}
 
 
-```{r}
+```{r hashtag_table}
 DT::datatable(ar_hashtags %>% count(hashtags_theme, sort = T), 
-              options = list(pageLength = 10))
+              options = list(pageLength = 10),
+              colnames = c('Hashtag theme', 'Frequency'))
 ```
 
-*** 
+***
 
-`r n_original` tweets: 
+#### `r n_original` tweets: 
 
 * `r percent_ht[1,1]` have 0 hashtags
 * `r percent_ht[2,1]` have 1 to `r max_ht` hashtags
 
 
-`r nrow(ar_hashtags)` hashtags used:
+#### `r nrow(ar_hashtags)` hashtags used:
 
 * `r ar_hashtags %>% count(hashtags) %>% n_distinct` unique hashtags
 * `r ar_hashtags %>% count(hashtags_theme) %>% n_distinct` unique hashtag themes
@@ -394,8 +439,8 @@ DT::datatable(ar_hashtags %>% count(hashtags_theme, sort = T),
   + mrx, marketresearch -> mrx
   
   
-### Trends with hashtag themes {data-commentary-width=650}
-```{r}
+### Hashtag theme trends {data-commentary-width=650}
+```{r hashtag_time_series}
 ar_hashtags_year %>% 
     ggplot(aes(x = year, y = n, group = hashtags_theme)) +
     geom_line(aes(col = fct_reorder(hashtags_theme, n, .desc = T))) +
@@ -416,7 +461,7 @@ ar_hashtags_year %>%
 ```  
 
 ***
-```{r}
+```{r popularity_hashtag}
 labels <- c(favorite_count = "# likes", 
             retweet_count = "# retweets")
 
@@ -425,10 +470,12 @@ ar_hashtags %>%
   filter(n > 50) %>% 
   select(favorite_count, retweet_count, hashtags_theme) %>% 
   gather(key = "popularity", value = "count", -hashtags_theme) %>% 
+  mutate(hashtags_theme = fct_rev(fct_relevel(hashtags_theme, 
+                                        "healthcare", "nhs", "cancer",
+                                        "bhbia", "mrx", "pharma"))) %>% 
   ggplot(aes(x = hashtags_theme, 
              y = count, 
              fill = popularity)) +
-             # fill = fct_reorder(popularity, count, .desc = T))) +
     geom_violin() +
     coord_flip() +
     facet_wrap(. ~ popularity, labeller = labeller(popularity = labels)) +
@@ -448,8 +495,8 @@ ar_hashtags %>%
 ```
 
 
-### Hashtag network {data-commentary-width=650}
-```{r}
+### Hashtag network 
+```{r hashtag_network_likes}
 hashtag_popularity <- ar_hashtags %>% 
   add_count(hashtags_theme) %>% 
   group_by(hashtags_theme) %>% 
@@ -482,30 +529,6 @@ top_corrs_ht %>%
     geom_edge_link() + 
     geom_node_point(aes(size = occurrences * 1.1)) +
     geom_node_point(aes(size = occurrences,
-                        color = geom_mean_likes)) + 
-    geom_node_text(aes(label = name), repel = TRUE) + 
-    theme_void() +
-    labs(color = "Average likes",
-         size = "Frequency",
-         title = "Frequency, likes, and relationships among @AdelphiResearch hashtags",
-         subtitle = "Hashtags with at least 5 occurrences") +
-    # scale_color_gradient(low = "#0091ff", high = "#f0650e")
-    # scale_color_gradient(low='#05D9F6', high='#5011D1')
-     scale_color_gradient(low='#E1FA72', high='#F46FEE')
-    # scale_color_gradient(low='#E1FA72', high='#5011D1')
-    # scale_color_gradientn(colours = rainbow(5))
-```
-
-***
-```{r}
-set.seed(2018)
-
-top_corrs_ht %>% 
-  graph_from_data_frame(vertices = vertices_ht) %>% 
-    ggraph() +
-    geom_edge_link() + 
-    geom_node_point(aes(size = occurrences * 1.1)) +
-    geom_node_point(aes(size = occurrences,
                         color = geom_mean_retweets)) + 
     geom_node_text(aes(label = name), repel = TRUE) + 
     theme_void() +
@@ -518,15 +541,16 @@ top_corrs_ht %>%
      scale_color_gradient(low='#E1FA72', high='#F46FEE')
     # scale_color_gradient(low='#E1FA72', high='#5011D1')
     # scale_color_gradientn(colours = rainbow(5))
+
 ```
 
 
 Tweet text {.storyboard}
 =========================================
 
-### Text network {data-commentary-width=650}
+### Text network 
 
-```{r}
+```{r word_network_retweets}
 text_words <- ar_original %>% 
   select(post_id, created_at, favorite_count, retweet_count, text) %>% 
   unnest_tokens(word, text) %>% 
@@ -565,27 +589,6 @@ top_corrs_text %>%
     geom_edge_link() + 
     geom_node_point(aes(size = occurrences * 1.1)) +
     geom_node_point(aes(size = occurrences,
-                        color = geom_mean_likes)) + 
-    geom_node_text(aes(label = name), repel = TRUE) + 
-    theme_void() +
-    labs(color = "Average likes",
-         size = "Frequency",
-         title = "Frequency, likes, and relationships among top 100 words") +
-    scale_color_gradient(low='#E1FA72', high='#F46FEE')
-
-```
-
-***
-
-```{r}
-set.seed(2018)
-
-top_corrs_text %>% 
-  graph_from_data_frame(vertices = vertices_text) %>% 
-    ggraph() +
-    geom_edge_link() + 
-    geom_node_point(aes(size = occurrences * 1.1)) +
-    geom_node_point(aes(size = occurrences,
                         color = geom_mean_retweets)) + 
     geom_node_text(aes(label = name), repel = TRUE) + 
     theme_void() +
@@ -597,7 +600,7 @@ top_corrs_text %>%
 ```
 
 ### LASSO model {data-commentary-width=650}
-```{r}
+```{r lasso_likes}
 tweet_word_matrix <- text_words %>% 
   add_count(word) %>% 
   filter(n > 30) %>% 
@@ -638,7 +641,7 @@ tidy(lasso_model$glmnet.fit) %>%
 ```
 
 ***
-```{r}
+```{r lasso_retweets}
 tweet_word_matrix <- text_words %>% 
   add_count(word) %>% 
   filter(n > 30) %>% 
@@ -671,7 +674,7 @@ tidy(lasso_model$glmnet.fit) %>%
     labs(y = "Estimate", 
          x = NULL,
          title = "Word associations with retweets",
-         subtitle = "Terms with at least 30 occurrences") +
+         subtitle = "Words with at least 30 occurrences") +
     scale_fill_discrete(name = "Association",
                       breaks = c(FALSE, TRUE),
                       labels = c("Positive", "Negative"))
@@ -689,63 +692,46 @@ Row
 
 #### Overall    
 * The frequency of tweets is descreasing in 2018, but like-to-tweet and retweet-to-tweet ratios are increasing.
-* #healthcare and #nhs peaked in 2015 - related to UK or US?
 
 #### Hashtag themes    
+* `#healthcare` and `#nhs` peaked in 2015 - related to UK or US?
 * No clear trends between common hashtag themes and likes or retweets.
-* `#mrx` / `#marketresearch` occurs frequently and often appears with other hashtags
-* `#innovation` tends to get more likes; `#mrs` and `#bhbia` tends to get more retweets
+* `#mrx` / `#marketresearch` occur frequently and often appear with other hashtags.
+* `#innovation` tends to get more likes; `#mrs` and `#bhbia` tends to get more retweets.
 
 #### Tweet text
-* Network analysis: words that got together and tend to get more likes/retweets 
+
+* _Network analysis_: words that got together and tend to get more likes/retweets 
   + won, BHBIA, BOBI awards
   + creating, change, wave ([this](https://twitter.com/AdelphiResearch/status/996412063907016704))
   + ready, boxes, involved, children
 
-* Model analysis: 
-  + words most positively associated with retweets/likes: conference, team
-  + words most negatively associated with retweets/likes: UK, guardian
+* _Model analysis_: words associated with retweets/likes
+  + positively -> conference, team
+  + negatively ->  UK, guardian
   
 
 Row
 -------------------------------------
 ### Future work 
 
-* Incorporate other variables (text length, whether or not has a url, whether or not has a picture, time, etc.) in a unified model.
-* Multivariate modeling with retweets and likes as a dual outcome?
-* Build an app that lets users predict number of retweets/likes based on input words or hashtags.
+* Incorporate other variables in a unified model.
+* Consider elastic net model for correlated variables.
+* Examine network of retweet-ers.
+* Sentiment analysis of tweet text.
+* Build app to predict number retweets/likes based on input words or hashtags.
 
 ### Applications
 
 * Text analysis of open-ended survey data.
 * Text analysis of open-ended claims data.
 * Reproducible reports for tight deadlines.
-* Social media in market research?
+* Social media in market research.
 
 
 ### Acknowledgements 
 
-[&commat;drob's #tidytuesday screencast on analyzing Medium posts](https://twitter.com/drob/status/1069954125020958720)
+* [&commat;drob's #tidytuesday screencast on analyzing Medium posts](https://twitter.com/drob/status/1069954125020958720)
+* [&commat;EmilyRiederer's suggestion to do a presentation using flexdashboard](https://twitter.com/EmilyRiederer/status/1073001289339027456)
 
-[&commat;EmilyRiederer's suggestion to do a presentation using flexdashboard](https://twitter.com/EmilyRiederer/status/1073001289339027456)
 
-
-<style>
-
-    .storyboard-nav .sbframelist {
-        margin: 0 auto;
-        width: 94%;
-        height: 50px;
-        overflow: hidden;
-        text-shadow: none;
-        margin-bottom: 8px;
-    }
-
-    .storyboard-nav .sbnext, .storyboard-nav .sbprev {
-        float: left;
-        width: 2%;
-        height: 50px;
-        font-size: 50px;
-    }
-
-</style>
