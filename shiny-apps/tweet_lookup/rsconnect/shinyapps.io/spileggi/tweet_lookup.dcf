@@ -1,0 +1,12 @@
+name: tweet_lookup
+title: tweet_lookup
+username:
+account: spileggi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 617278
+bundleId: 1764227
+url: https://spileggi.shinyapps.io/tweet_lookup/
+when: 1544824982.4943
+asMultiple: FALSE
+asStatic: FALSE
