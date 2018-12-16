@@ -510,8 +510,10 @@ hashtag_popularity <- ar_hashtags %>%
             median_retweets = median(retweet_count),
             total_likes = sum(favorite_count),
             total_retweets = sum(retweet_count),
-            geom_mean_likes = exp(mean(log(favorite_count + 1))),
-            geom_mean_retweets = exp(mean(log(retweet_count + 1))),
+            geom_mean_likes = exp(mean(log(favorite_count + 1))) - 1,
+            geom_mean_retweets = exp(mean(log(retweet_count + 1))) - 1,
+            mean_likes = mean(favorite_count),
+            mean_retweets = mean(retweet_count),
             occurrences = n()) %>% 
   arrange(desc(occurrences)) 
 
@@ -535,7 +537,7 @@ top_corrs_ht %>%
     geom_edge_link() + 
     # geom_node_point(aes(size = occurrences * 1.1)) +
     geom_node_point(aes(size = occurrences,
-                        color = geom_mean_retweets)) + 
+                        color = mean_retweets)) + 
     geom_node_text(aes(label = name), repel = TRUE) + 
     theme_void() +
     labs(color = "Average retweets",
@@ -568,8 +570,10 @@ text_words_popularity <- text_words %>%
             median_retweets = median(retweet_count),
             total_likes = sum(favorite_count),
             total_retweets = sum(retweet_count),
-            geom_mean_likes = exp(mean(log(favorite_count + 1))),
-            geom_mean_retweets = exp(mean(log(retweet_count + 1))),
+            geom_mean_likes = exp(mean(log(favorite_count + 1))) - 1,
+            geom_mean_retweets = exp(mean(log(retweet_count + 1))) - 1,
+            mean_likes = mean(favorite_count),
+            mean_retweets = mean(retweet_count),
             occurrences = n()) %>% 
   arrange(desc(occurrences)) 
   
@@ -592,7 +596,7 @@ top_corrs_text %>%
     geom_edge_link() + 
     # geom_node_point(aes(size = occurrences * 1.1)) +
     geom_node_point(aes(size = occurrences,
-                        color = geom_mean_retweets)) + 
+                        color = mean_retweets)) + 
     geom_node_text(aes(label = name), repel = TRUE) + 
     theme_void() +
     labs(color = "Average retweets",
