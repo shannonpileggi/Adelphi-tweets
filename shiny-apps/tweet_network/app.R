@@ -31,11 +31,11 @@ tweets <- tweets %>%
         month_year = lubridate::ymd(paste(year, month, 1, sep = '-')),
         post_id = row_number()
     ) %>% 
-    filter(type == "original")
+    dplyr::filter(type == "original")
 
 hashtags <- tweets %>% 
     unnest(hashtags) %>% 
-    mutate(hashtags_lc = tolower(hashtags),
+    dplyr::mutate(hashtags_lc = tolower(hashtags),
            word =  case_when(
                str_detect(hashtags_lc, "bhbia") == TRUE |
                    str_detect(hashtags_lc, "bobi") == TRUE ~ "bhbia",
@@ -67,14 +67,15 @@ hashtags <- tweets %>%
                # ------------------------------------------------------
                TRUE ~ hashtags_lc
            )) %>% 
-    filter(is.na(hashtags) == F) %>% 
-    add_count(word)
-
+    dplyr::filter(is.na(hashtags) == F) %>% 
+    add_count(word) %>% 
+    select(post_id, created_at, word, n, favorite_count, retweet_count)
+ 
 text_words <- tweets %>% 
     select(post_id, created_at, favorite_count, retweet_count, text) %>% 
     unnest_tokens(word, text) %>% 
     anti_join(stop_words, by = "word") %>% 
-    filter(!(word %in% c("t.co", "http", "https")),
+    dplyr::filter(!(word %in% c("t.co", "http", "https")),
            str_detect(word, "[a-z]")) %>% 
     add_count(word)
 
@@ -105,7 +106,7 @@ ui <- fluidPage(
                          max = 75, 
                          step = 10),
             numericInput(inputId = "top", 
-                         label = "Top correlations:", 
+                         label = "Top correlations:",
                          value = 50, 
                          min = 25, 
                          max = 150, 
@@ -135,14 +136,14 @@ server <- function(input, output, session) {
     output$plot <- renderPlot({
         
         if (input$outcome == "hashtags") data <- hashtags
-        if (input$outcome == "text words") data <- text_words
+        if (input$outcome == "tweet text") data <- text_words
         
         data <- data %>% 
-            filter(lubridate::year(created_at) >= input$years[1],
-                   lubridate::year(created_at) <= input$years[2])
+            dplyr::filter(lubridate::year(created_at) >= input$years[1],
+                          lubridate::year(created_at) <= input$years[2])
         
         top_corrs <- data %>% 
-            filter(n >= input$freq) %>% 
+            dplyr::filter(n >= input$freq) %>% 
             select(post_id, word) %>% 
             pairwise_cor(word, post_id, sort = T) %>% 
             head(input$top) 
@@ -150,11 +151,11 @@ server <- function(input, output, session) {
         vertices <- data %>%  
             add_count(word) %>% 
             group_by(word) %>% 
-            summarize(geom_mean_likes = exp(mean(log(favorite_count + 1))),
-                      geom_mean_retweets = exp(mean(log(retweet_count + 1))),
+            summarize(mean_likes = mean(favorite_count),
+                      mean_retweets = mean(retweet_count),
                       occurrences = n()) %>% 
             arrange(desc(occurrences)) %>% 
-            filter(word %in% top_corrs$item1 | 
+            dplyr::filter(word %in% top_corrs$item1 | 
                        word %in% top_corrs$item2)
         
         set.seed(2018)
@@ -166,8 +167,8 @@ server <- function(input, output, session) {
             geom_node_point(aes_string(size = "occurrences",
                                        color = ifelse(
                                            input$metric == "likes", 
-                                           "geom_mean_likes",
-                                           "geom_mean_retweets"
+                                           "mean_likes",
+                                           "mean_retweets"
                                        ))) + 
             geom_node_text(aes(label = name, size = 100), repel = TRUE) + 
             theme_void() +
