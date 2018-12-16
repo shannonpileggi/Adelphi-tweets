@@ -75,7 +75,7 @@ text_words <- tweets %>%
     select(post_id, created_at, favorite_count, retweet_count, text) %>% 
     unnest_tokens(word, text) %>% 
     anti_join(stop_words, by = "word") %>% 
-    dplyr::filter(!(word %in% c("t.co", "http", "https")),
+    dplyr::filter(!(word %in% c("t.co", "http", "https", "amp", "rt")),
            str_detect(word, "[a-z]")) %>% 
     add_count(word)
 
